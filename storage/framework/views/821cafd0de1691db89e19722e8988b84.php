@@ -1,0 +1,2 @@
+<?php echo $__env->make(backpack_view('inc.menu_items'), \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>
+<?php /**PATH C:\Users\IMSD-CASHIER\Desktop\Tabulation\TABULATE\vendor/backpack/theme-tabler/resources/views/inc/sidebar_content.blade.php ENDPATH**/ ?>
