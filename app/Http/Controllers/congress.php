@@ -730,6 +730,19 @@ class congress extends Controller
         $newcontestant->office = $request->office;
         $newcontestant->gender = $request->gender;
         $newcontestant->contest = $request->contest;
+        if ($request->contest === 'mmg'){
+            if ($request->office === 'DNFO'){
+                $newcontestant->npo = 'CONTENDER F';}
+            else if ($request->office === 'DSFO'){
+                $newcontestant->npo = 'CONTENDER B';}
+            else if ($request->office === 'DOCFO'){
+                $newcontestant->npo = 'CONTENDER E';}
+            else if ($request->office === 'DORFO'){
+                $newcontestant->npo = 'CONTENDER D';}
+            else if ($request->office === 'DOFO'){
+                $newcontestant->npo = 'CONTENDER A';}
+            else if ($request->office === 'DCFO'){
+                $newcontestant->npo = 'CONTENDER C';}}
         $newcontestant->save();
 
             if ($request->contest === 'mmg'){{
@@ -932,10 +945,10 @@ class congress extends Controller
 
     public function dashboard(){//done
         $user = Auth::user()->get();
-        $mmmg = contestant::where('contest', 'mmg')->where('name','!=','init')->where('gender','M')->get();
-        $mranks = $this->mrank();
-        $franks = $this->frank();
-        $fmmg = contestant::where('contest', 'mmg')->where('name','!=','init')->where('gender','F')->get();
+        $mmmg = contestant::where('contest', 'mmg')->where('name','!=','init')->where('gender','M')->orderby('npo', 'asc')->get();
+        $mranks = $this->dmrank();
+        $franks = $this->dfrank();
+        $fmmg = contestant::where('contest', 'mmg')->where('name','!=','init')->where('gender','F')->orderby('npo', 'asc')->get();
         $mge = mgescore::orderby('npo', 'asc')->get();
         $mgerank = $this->mgerank();
         $gcqb = gcqbscore::orderby('npo', 'asc')->get();
@@ -1122,7 +1135,7 @@ class congress extends Controller
             return $mergedData;}
 
     public function frank(){
-        $franks = contestant::where('gender', 'M')->select('id', 'overall')//change to cn after arrangement
+        $franks = contestant::where('gender', 'F')->select('id', 'overall')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -1199,4 +1212,73 @@ class congress extends Controller
                     return $sortedItem->id === $originalItem->id;});});
             return view('welcome',['mmmg' => $mmmg,'mranks'=>$mranks,'franks'=>$franks,'fmmg' => $fmmg, 'gmdc' => $gmdc , 'ranks' => $ranks, 
             'gcqb' => $gcqb, 'mge' => $mge, 'mgerank' => $mgerank, 'gcqbrank' => $gcqbrank]);}
+
+    public function dmrank(){
+        $mrank = contestant::where('gender', 'M')->select('id', 'overall', 'npo')->orderBy('npo', 'asc')//change to cn after arrangement
+            ->get()
+            ->map(function ($item, $key) {
+            $item->original_position = $key + 1; // Adding 1 to start with position 1.
+            return $item;
+            });
+
+            // Sort the data based on the "total" column in descending order.
+            $sortedData = $mrank->sortByDesc('overall');
+
+            // Assign rankings to the sorted data.
+            $ranking = 1;
+            
+            $previousRank = null;
+            $previousTotal = null;
+            $sortedData = $sortedData->map(function ($item) use (&$ranking, &$previousTotal, &$previousRank) {
+                if ($previousTotal !== null && $item->overall !== $previousTotal) {
+                    $ranking++;
+                }
+                if ($previousTotal !== null && $item->overall === $previousTotal) {
+                    $ranking++;
+                }
+                $item->ranking = $previousRank !== null && $item->overall === $previousTotal ? $previousRank : $ranking . $this->getRankSuffix($ranking);
+                $previousTotal = $item->overall;
+                $previousRank = $item->ranking;
+                return $item;});
+
+            // Merge the sorted and ranked data with the original data.
+            $mergedData = $mrank->map(function ($originalItem) use ($sortedData) {
+                return $sortedData->first(function ($sortedItem) use ($originalItem) {
+                    return $sortedItem->id === $originalItem->id;});});
+            return $mergedData;}
+
+    public function dfrank(){
+        $franks = contestant::where('gender', 'F')->select('id', 'overall','npo')->orderBy('npo', 'asc')//change to cn after arrangement
+            ->get()
+            ->map(function ($item, $key) {
+            $item->original_position = $key + 1; // Adding 1 to start with position 1.
+            return $item;
+            });
+
+            // Sort the data based on the "total" column in descending order.
+            $sortedData = $franks->sortByDesc('overall');
+
+            // Assign rankings to the sorted data.
+            $ranking = 1;
+            
+            $previousRank = null;
+            $previousTotal = null;
+            $sortedData = $sortedData->map(function ($item) use (&$ranking, &$previousTotal, &$previousRank) {
+                if ($previousTotal !== null && $item->overall !== $previousTotal) {
+                    $ranking++;
+                }
+                if ($previousTotal !== null && $item->overall === $previousTotal) {
+                    $ranking++;
+                }
+                $item->ranking = $previousRank !== null && $item->overall === $previousTotal ? $previousRank : $ranking . $this->getRankSuffix($ranking);
+                $previousTotal = $item->overall;
+                $previousRank = $item->ranking;
+                return $item;});
+
+            // Merge the sorted and ranked data with the original data.
+            $mergedData = $franks->map(function ($originalItem) use ($sortedData) {
+                return $sortedData->first(function ($sortedItem) use ($originalItem) {
+                    return $sortedItem->id === $originalItem->id;});});
+            return $mergedData;}
+
 }
