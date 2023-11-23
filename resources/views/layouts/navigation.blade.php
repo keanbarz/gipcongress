@@ -44,17 +44,17 @@
                             </div>
                         </button>
                     </x-slot>
-                    <x-slot name="content">
-                        <x-dropdown-link href="/tabulate/mmg">
+                    <x-slot name="content" >
+                        <x-dropdown-link href="/tabulate/mmg" style="color:green">
                             {{ __('Mr. & Ms. GIP 2023') }}
                         </x-dropdown-link>
-                        <x-dropdown-link href="/tabulate/gmdc">
+                        <x-dropdown-link href="/tabulate/gmdc" style="color:green">
                             {{ __('GIP Modern Dance Contest') }}
                         </x-dropdown-link>
-                        <x-dropdown-link href="/tabulate/gcqb">
+                        <x-dropdown-link href="/tabulate/gcqb" style="color:green">
                             {{ __('GIP Congress Quiz Bee') }}
                         </x-dropdown-link>
-                        <x-dropdown-link href="/tabulate/mge">
+                        <x-dropdown-link href="/tabulate/mge" style="color:green">
                             {{ __('My GIP Experience') }}
                         </x-dropdown-link>
                     </x-slot>

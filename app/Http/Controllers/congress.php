@@ -118,8 +118,8 @@ class congress extends Controller
 
 
 
-        $fcon = contestant::where('gender', 'F')->get();
-        $mcon = contestant::where('gender', 'M')->get();
+        $fcon = contestant::where('gender', 'F')->orderBy('cn', 'asc')->get();
+        $mcon = contestant::where('gender', 'M')->orderBy('cn', 'asc')->get();
         $mranks = $this->mrank();
         $franks = $this->frank();
             return view('mmg', ['mcon' => $mcon, 'fcon' => $fcon, 'mranks' => $mranks,'franks' => $franks]);}
@@ -470,8 +470,8 @@ class congress extends Controller
                 $recalcu->aaij = ($recalcu->aij1+$recalcu->aij2+$recalcu->aij3)/3;
                 $recalcu->total= $recalcu->acrj + $recalcu->amej + $recalcu->aevj +$recalcu->aaij;
                 $recalcu->save();}
-        $gmdcscores = gmdcscore::all();
-        $ranks = gmdcscore::select('id', 'total')//change to cn after arrangement
+        $gmdcscores = gmdcscore::orderby('cn', 'asc')->get();
+        $ranks = gmdcscore::select('id', 'total')->orderby('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -581,8 +581,8 @@ class congress extends Controller
                 $recalcu->acarj = ($recalcu->carj1+$recalcu->carj2+$recalcu->carj3)/3;
                 $recalcu->total= $recalcu->acarj + $recalcu->acrj;
                 $recalcu->save();}
-        $mgescores = mgescore::all();
-        $ranks = mgescore::select('id', 'total')//change to cn after arrangement
+        $mgescores = mgescore::orderby('cn', 'asc')->get();
+        $ranks = mgescore::select('id', 'total')->orderby('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -673,9 +673,9 @@ class congress extends Controller
             abort(403, 'Unauthorized action.');}
 
     public function gcqb(){
-        $gcqbscores = gcqbscore::all();
-        $gcqbtop3 = gcqbscore::orderBy('r1r2', 'desc')->limit(3)->get();
-        $ranks = gcqbscore::select('id', 'r1r2')//change to cn after arrangement
+        $gcqbscores = gcqbscore::orderBy('cn', 'asc')->get();
+        $gcqbtop3 = gcqbscore::orderBy('r1r2', 'desc')->limit(3)->orderBy('cn', 'asc')->get();
+        $ranks = gcqbscore::select('id', 'r1r2')->orderBy('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -732,17 +732,23 @@ class congress extends Controller
         $newcontestant->contest = $request->contest;
         if ($request->contest === 'mmg'){
             if ($request->office === 'DNFO'){
-                $newcontestant->npo = 'CONTENDER F';}
+                $newcontestant->npo = 'CONTENDER F';
+                $newcontestant->cn = '4';}
             else if ($request->office === 'DSFO'){
-                $newcontestant->npo = 'CONTENDER B';}
+                $newcontestant->npo = 'CONTENDER B';
+                $newcontestant->cn = '6';}
             else if ($request->office === 'DOCFO'){
-                $newcontestant->npo = 'CONTENDER E';}
+                $newcontestant->npo = 'CONTENDER E';
+                $newcontestant->cn = '1';}
             else if ($request->office === 'DORFO'){
-                $newcontestant->npo = 'CONTENDER D';}
+                $newcontestant->npo = 'CONTENDER D';
+                $newcontestant->cn = '2';}
             else if ($request->office === 'DOFO'){
-                $newcontestant->npo = 'CONTENDER A';}
+                $newcontestant->npo = 'CONTENDER A';
+                $newcontestant->cn = '3';}
             else if ($request->office === 'DCFO'){
-                $newcontestant->npo = 'CONTENDER C';}}
+                $newcontestant->npo = 'CONTENDER C';
+                $newcontestant->cn = '5';}}
         $newcontestant->save();
 
             if ($request->contest === 'mmg'){{
@@ -1000,7 +1006,7 @@ class congress extends Controller
             return 'th';}}
 
     public function gcqbtoprank(){
-        $ranks = gcqbscore::select('id', 'total')->orderBy('r1r2', 'desc')->limit(3)->orderBy('total', 'desc')//change to cn after arrangement
+        $ranks = gcqbscore::select('id', 'total')->orderBy('r1r2', 'desc')->limit(3)->orderBy('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -1101,7 +1107,7 @@ class congress extends Controller
             return $mergedData;}
 
     public function mrank(){
-        $mrank = contestant::where('gender', 'M')->select('id', 'overall')//change to cn after arrangement
+        $mrank = contestant::where('gender', 'M')->select('id', 'overall')->orderBy('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
@@ -1135,7 +1141,7 @@ class congress extends Controller
             return $mergedData;}
 
     public function frank(){
-        $franks = contestant::where('gender', 'F')->select('id', 'overall')//change to cn after arrangement
+        $franks = contestant::where('gender', 'F')->select('id', 'overall')->orderBy('cn', 'asc')//change to cn after arrangement
             ->get()
             ->map(function ($item, $key) {
             $item->original_position = $key + 1; // Adding 1 to start with position 1.
